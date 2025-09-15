@@ -1,0 +1,145 @@
+//ques - 647. Palindromic Substrings
+
+//approach 1 - naive approach
+//TC- O(n^3)
+
+class Solution {
+public:
+    //Brute Force 
+
+    bool isPalindrom(string &str){
+        int n = str.size();
+        int i = 0, j = n-1;
+
+        while(i < j){
+            if(str[i] != str[j]){
+                return false;
+            }
+            i++;
+            j--;
+        }
+        return true;
+    }
+
+    int countSubstrings(string s) {
+        int n = s.size();
+        int count = 0;
+
+        for(int i = 0; i < n; i++){
+            string temp = "";
+            for(int j = i; j < n; j++){
+                temp += s[j];
+                if(isPalindrom(temp)){
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+};
+
+------------------------------------------------------------------------------------------------------------------------------
+//Approach 2 
+
+class Solution {
+public:
+    //recursion + memoization
+
+    int t[1001][1001];
+
+    bool isPalindrom(int i, int j, string &str){
+        while(i < j){
+            if(str[i] != str[j]){
+                return false;
+            }
+            i++;
+            j--;
+        }
+        return true;
+    }
+
+    int solve(int i, int j, string &s){
+        if(i == s.size()) return 0;
+        
+        int ans = 0;
+
+        if(j == s.size()) {
+            return t[i][j] = solve(i+1, i+1, s);
+        }
+
+        if(isPalindrom(i, j, s)){
+            ans += 1;
+        }
+        ans += solve(i, j+1, s);
+        return t[i][j] = ans;
+    }
+
+    int countSubstrings(string s) {
+        int n = s.size();
+
+        memset(t, -1, sizeof(t));
+
+        return solve(0, 0, s);
+    }
+};
+------------------------------------------------------------------------------------------------------------------------------
+//approach 3
+//TC- O(n^2)
+
+class Solution {
+public:
+    int countSubstrings(string s) {
+        int n = s.size();
+
+        vector<vector<bool>> t(n, vector<bool>(n, false));
+        int count = 0;
+
+        for (int len = 1; len <= n; len++) {
+            //length 1 ka uske baad length 2 ka aur so on.... 
+            for (int i = 0; i + len - 1 < n; i++) {
+                int j = i + len - 1;
+                if (i == j) {
+                    t[i][j] = true;
+                } else if (i + 1 == j) {
+                    if (s[i] == s[j] && s[i + 1] == s[j])
+                        t[i][j] = true;
+                } else {
+                    t[i][j] = s[i] == s[j] && t[i + 1][j - 1];
+                }
+                if (t[i][j]) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+};
+
+----------------------------------------------------------------------------------------------------------------------------
+//Approach - 4
+//TC- O(n^2)
+//SC- O(1)
+
+class Solution {
+public:
+    int count = 0;
+
+    void check(int i, int j, string &s, int n){
+        while(i >= 0 && j < n && s[i] == s[j]){
+            count++;
+            i--;
+            j++;
+        }
+    }
+
+    int countSubstrings(string s) {
+        int n = s.size();
+        count = 0;
+
+        for(int i = 0; i < n; i++){
+            check(i, i, s, n);
+            check(i, i+1, s, n);
+        }
+        return count;
+    }
+};
