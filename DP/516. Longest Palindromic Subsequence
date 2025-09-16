@@ -1,0 +1,114 @@
+// Que - 516. Longest Palindromic Subsequence
+
+//Approach 1 - using recursion 
+class Solution {
+public:
+    bool isPalindrome(string &s){
+        int i = 0, j = s.size()-1;
+        while(i < j){
+            if(s[i] != s[j]){
+                return false;
+            }
+            i++;
+            j--;
+        }
+        return true;
+    }
+
+    int maxL = 1;
+
+    int solve(int idx, string &temp, string &s){
+        if(idx >= s.size()){
+            if(isPalindrome(temp)){
+                if(maxL < temp.size())
+                maxL = temp.size();
+            }
+            return 0;
+        }
+
+        temp += s[idx];
+        solve(idx+1, temp, s);
+
+        temp.pop_back();
+        solve(idx+1, temp, s);
+
+        return maxL;
+    }
+
+
+    int longestPalindromeSubseq(string s) {
+        string temp = "";
+        return solve(0,temp, s);
+    }
+};
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+//Approach 2
+//recursion + memoization
+//eska LCS nikal lege to answer aa jayega 2nd string 1st string ka reverse hoga
+
+class Solution {
+public:
+    int t[1001][1001];
+
+    int LCS(int i, int j, string &s1, string &s2){
+        if(i >= s1.size() || j >= s2.size()){
+            return 0;
+        }
+
+        if(t[i][j] != -1) return t[i][j];
+
+        if(s1[i] == s2[j]){
+            return t[i][j] = 1+LCS(i+1, j+1, s1, s2);
+        }
+
+        int skip1 = LCS(i, j+1, s1, s2);
+        int skip2 = LCS(i+1, j, s1, s2);
+        return t[i][j] = max(skip1, skip2);
+    }
+
+
+    int longestPalindromeSubseq(string s) {
+        //esko banane ka eak tarika ye hai ki s ka reverse nikal lo 
+        //aur dono ka common longest subsequence nikal lo
+        string temp = s;
+        reverse(s.begin(), s.end());
+
+        memset(t, -1, sizeof(t));
+        
+        return LCS(0, 0, temp, s);
+    }
+};
+
+------------------------------------------------------------------------------------------------------------------------------
+//Approach 3 without using LCS method
+
+class Solution {
+public:
+
+    int t[1001][1001];
+
+    int solve(int i, int j, string &s){
+        if(i > j) return 0;
+        if(i == j) return 1;
+
+        if(t[i][j] != -1) return t[i][j];
+
+        if(s[i] == s[j]){
+            return t[i][j] = 2+solve(i+1, j-1, s);
+        }
+
+        return t[i][j] = max(solve(i+1, j, s), solve(i, j-1, s));
+    }
+
+
+    int longestPalindromeSubseq(string s) {
+        int n = s.size();
+        memset(t, -1, sizeof(t));
+
+        return solve(0, n-1, s);
+    }
+};
+
+
