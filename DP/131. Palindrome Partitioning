@@ -1,0 +1,93 @@
+// Ques - 131. Palindrome Partitioning
+
+//Approach - 1
+//recursion
+
+class Solution {
+public:
+    bool isPalindrome(int i, int j, string &s){
+        if(i > j) return true;
+        if(s[i] == s[j]){
+            return isPalindrome(i+1, j-1, s);
+        }
+        return false;
+    }
+
+    void solve(int idx, string &s, vector<string>&temp, vector<vector<string>>&ans){
+        if(idx == s.size()){
+            ans.push_back(temp);
+            return;
+        }
+
+        for(int i = idx; i < s.size(); i++){
+            if(isPalindrome(idx, i, s)){
+                temp.push_back(s.substr(idx, i-idx+1));
+                solve(i+1,s , temp, ans);
+                temp.pop_back();
+            }
+        }
+        
+    }
+
+    vector<vector<string>> partition(string s) {
+        int n = s.length();
+        vector<vector<string>>ans;
+        vector<string>temp;
+        solve(0, s, temp, ans);
+        return ans;
+    }
+};
+
+-----------------------------------------------------------------------------------------------------------------------------
+//Approach - 2
+// Bottom up
+
+class Solution {
+public: 
+
+    void solve(int i, string &s, vector<string>&temp, vector<vector<string>>&ans, vector<vector<bool>>&t){
+        if(i >= s.size()){
+            ans.push_back(temp);
+            return;
+        }
+
+        for(int j = i; j < s.size(); j++){
+            if(t[i][j]){
+                temp.push_back(s.substr(i, j-i+1));
+                solve(j+1, s, temp, ans, t);
+                temp.pop_back();
+            }
+        }
+
+    }
+
+
+    vector<vector<string>> partition(string s) {
+        int n = s.length();
+
+        vector<vector<bool>>t(n, vector<bool>(n));
+
+        for(int i = 0; i < n; i++){
+            t[i][i] = true;
+        }
+
+        for(int len = 2; len <= n; len++){
+            for(int i = 0; i+len-1 < n; i++){
+                int j = i+len-1;
+                if(i+1 == j){
+                    t[i][j] = s[i] == s[j];
+                    
+                }else{
+                    t[i][j] = ((s[i] == s[j]) && t[i+1][j-1]);
+                }
+            }
+        }
+
+        vector<vector<string>>ans;
+        vector<string>temp;
+
+        solve(0, s, temp, ans, t);
+
+        return ans;
+    }
+};
