@@ -1,0 +1,138 @@
+//Ques - 1594. Maximum Non Negative Product in a Matrix
+
+//Approach - 1
+
+class Solution {
+public:
+    int n, m;
+    typedef long long ll;
+    int MOD = 1e9+7;
+
+    vector<vector<pair<long long, long long>>>t;
+
+    pair<ll, ll> solve(int i, int j, vector<vector<int>>&grid){
+        
+        if(i == n-1 && j == m-1) return {grid[i][j], grid[i][j]};
+
+        ll maxVal = LLONG_MIN;
+        ll minVal = LLONG_MAX;
+
+        if(t[i][j].first != LLONG_MIN && t[i][j].second != LLONG_MAX){
+            return {t[i][j].first, t[i][j].second};
+        }
+
+        //down
+
+        if(i < n-1){
+            auto[downMax, downMin] = solve(i+1, j, grid);
+            maxVal = max({maxVal, grid[i][j]*downMax, grid[i][j]*downMin});
+            minVal = min({minVal, grid[i][j]*downMax, grid[i][j]*downMin});
+        }
+        //right
+        if(j < m-1){
+            auto[rightMax, rightMin] = solve(i, j+1, grid);
+            maxVal = max({maxVal, grid[i][j]*rightMax, grid[i][j]*rightMin});
+            minVal = min({minVal, grid[i][j]*rightMax, grid[i][j]*rightMin});
+        }
+        
+        return t[i][j] = {maxVal, minVal};
+    }
+
+    int maxProductPath(vector<vector<int>>& grid) {
+        n = grid.size();
+        m = grid[0].size();
+
+        t = vector<vector<pair<ll, ll>>>(n, vector<pair<ll, ll>>(m, {LLONG_MIN, LLONG_MAX}));
+
+        auto[maxPro, minPro] = solve(0, 0, grid);
+
+        return maxPro < -1 ? -1 : maxPro%MOD;
+
+    }
+};
+
+-----------------------------------------------------------------------------------------------------------------------------
+//Approach - 2
+
+//Bottom up approach
+
+class Solution {
+public:
+    typedef long long  ll;
+    int MOD = 1e9+7;
+
+    int maxProductPath(vector<vector<int>>& grid) {
+        int m = grid.size();
+        int n = grid[0].size();
+
+        vector<vector<pair<ll, ll>>>dp(m, vector<pair<ll, ll>>(n));
+        dp[0][0] = make_pair(grid[0][0], grid[0][0]);
+
+        //0 th row fill karo 
+
+        for(int j = 1; j < n; j++){
+            dp[0][j] = {grid[0][j]*dp[0][j-1].first, grid[0][j]*dp[0][j-1].second};
+        } 
+        //0 th col fill karo
+        for(int i = 1; i < m; i++){
+            dp[i][0] = {grid[i][0]*dp[i-1][0].first, grid[i][0]*dp[i-1][0].second};
+        }
+
+        for(int i = 1; i < m; i++){
+            for(int j = 1; j < n; j++){
+                ll downMax = grid[i][j]*dp[i-1][j].first;
+                ll downMin = grid[i][j]*dp[i-1][j].second;
+                ll rightMax = grid[i][j]*dp[i][j-1].first;
+                ll rightMin = grid[i][j]*dp[i][j-1].second;
+
+                ll maxPro = max({downMax, downMin, rightMax, rightMin});
+                ll minPro = min({downMax, downMin, rightMax, rightMin});
+                dp[i][j] = {maxPro, minPro};
+            }
+        } 
+
+        auto[maxPro, minPro] = dp[m-1][n-1];
+
+        return maxPro < 0 ? -1 : maxPro%MOD;
+
+    }
+};
+------------------------------------------------------------------------------------------------------------------------
+//Approach - 3
+// Bottom up + memory optimization
+
+class Solution {
+public:
+    int MOD = 1e9+7;
+    typedef long long ll;
+    int maxProductPath(vector<vector<int>>& grid) {
+        int n = grid.size();
+        int m = grid[0].size();
+
+        vector<pair<ll,ll>> dp(m);
+        dp[0] = {grid[0][0],grid[0][0]};
+
+        for(int i=1; i<m; i++) {
+            ll ans = dp[i-1].first * grid[0][i];
+            dp[i] = {ans,ans};
+        }
+
+        for(int i=1; i<n; i++) {
+            ll ans = dp[0].first * grid[i][0];
+            dp[0] = {ans,ans};
+            for(int j=1; j<m; j++) {
+                ll opt1 = dp[j-1].first * grid[i][j];
+                ll opt2 = dp[j-1].second * grid[i][j];
+                ll opt3 = dp[j].first * grid[i][j];
+                ll opt4 = dp[j].second * grid[i][j];
+                ll maxi = max({opt1,opt2,opt3,opt4});
+                ll mini = min({opt1,opt2,opt3,opt4});
+                dp[j] = {mini,maxi};
+            }
+        }
+
+        return max(max(dp[m-1].first,dp[m-1].second) % MOD, -1ll);
+    }
+};
+
+
