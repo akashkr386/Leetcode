@@ -1,0 +1,108 @@
+//Ques - 174. Dungeon Game
+
+//Approach - 1 recursion+memoization
+
+class Solution {
+public:
+    int n, m;
+    int t[201][201];
+
+    int solve(int row, int col, vector<vector<int>>& d){
+        if(row >= n || col >= m) return INT_MAX;
+        //base case
+        if(row == n-1 && col == m-1){
+            if(d[row][col] <= 0){
+                return abs(d[row][col])+1;
+            }
+            return 1;
+        }
+
+        if(t[row][col] != -1) return t[row][col];
+
+        int down = solve(row+1, col, d);
+        int right = solve(row, col+1, d);
+        int res = min(down, right) - d[row][col];
+        return t[row][col] = res <= 0 ? 1 : res;
+    }
+    
+
+    int calculateMinimumHP(vector<vector<int>>& dungeon) {
+        n = dungeon.size();
+        m = dungeon[0].size();
+
+        memset(t, -1, sizeof(t));
+
+        return solve(0, 0, dungeon);
+    }
+};
+
+------------------------------------------------------------------------------------------------------------------------
+//Approach - 2
+//Bottom up approach
+
+class Solution {
+public:
+    
+
+    int calculateMinimumHP(vector<vector<int>>& dungeon) {
+        int n = dungeon.size();
+        int m = dungeon[0].size();
+
+        vector<vector<int>>t(n, vector<int>(m));
+
+        for(int row = n-1; row >= 0; row--){
+            for(int col = m-1; col >= 0; col--){
+                if(row == n-1 && col == m-1){
+                    if(dungeon[row][col] <= 0){
+                        t[row][col] = abs(dungeon[row][col])+1;
+                    }
+                    else
+                    t[row][col] = 1;
+                }else{
+                    int down = row+1 >= n ? INT_MAX : t[row+1][col];
+                    int right = col+1 >= m ? INT_MAX : t[row][col+1];
+                    int res = min(down, right) - dungeon[row][col];
+                    t[row][col] = res <= 0 ? 1 : res;
+                }
+            }
+        }
+
+        return t[0][0];
+    }
+};
+
+---------------------------------------------------------------------------------------------------------------------------
+//Approach - 3
+//Bottom up + space optimization
+
+class Solution {
+public:
+    
+
+    int calculateMinimumHP(vector<vector<int>>& dungeon) {
+        int n = dungeon.size();
+        int m = dungeon[0].size();
+
+        vector<int>t(m, INT_MAX);
+
+        for(int row = n-1; row >= 0; row--){
+            for(int col = m-1; col >= 0; col--){
+                if(row == n-1 && col == m-1){
+                    if(dungeon[row][col] <= 0){
+                        t[col] = abs(dungeon[row][col])+1;
+                    }
+                    else
+                    t[col] = 1;
+                }else{
+                    int down = row+1 >= n ? INT_MAX : t[col];
+                    int right = col+1 >= m ? INT_MAX : t[col+1];
+                    int res = min(down, right) - dungeon[row][col];
+                    t[col] = res <= 0 ? 1 : res;
+                }
+            }
+        }
+
+        return t[0];
+    }
+};
+
