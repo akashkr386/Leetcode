@@ -1,0 +1,88 @@
+//Ques - 120. Triangle
+//Approach - 1 recursion+memoization
+
+class Solution {
+public:
+    int n, m;
+    int t[201][201];
+
+    int solve(int i, int j, vector<vector<int>>& tri){
+        if(i >= n) return 0;
+
+        if(t[i][j] != -1) return t[i][j];
+        
+        if(i == n-1) return t[i][j] = tri[i][j];
+
+        return t[i][j] = tri[i][j] + min(solve(i+1, j, tri), solve(i+1, j+1, tri));
+    }
+
+    int minimumTotal(vector<vector<int>>& triangle) {
+        int ans = 0;
+        
+        n = triangle.size(), m = triangle[0].size();
+        memset(t, -1, sizeof(t));
+        return solve(0, 0, triangle);
+
+    }
+};
+-------------------------------------------------------------------------------------------------------------------------
+//Approach - 2
+//Bottom up approach
+
+class Solution {
+public:
+    int minimumTotal(vector<vector<int>>& tri) {
+        int n = tri.size();
+
+        vector<vector<int>>dp = tri;
+
+        for(int i = n-2; i >= 0; i--){
+            for(int j = 0; j <= i; j++){
+                dp[i][j] = tri[i][j] + min(dp[i+1][j], dp[i+1][j+1]);
+            }
+        }
+
+        return dp[0][0];
+    }
+};
+
+----------------------------------------------------------------------------------------------------------------------------
+//Approach - 3
+//Bottom up + space optimization 
+
+class Solution {
+public:
+    int minimumTotal(vector<vector<int>>& tri) {
+        int n = tri.size();
+
+        vector<int>dp = tri[n-1];
+
+        for(int i = n-2; i >= 0; i--){
+            for(int j = 0; j <= i; j++){
+                dp[j] = tri[i][j] + min(dp[j], dp[j+1]);
+            }
+        }
+
+        return dp[0];
+    }
+};
+------------------------------------------------------------------------------------------------------------------------------
+//Approach - 4
+//constant space
+
+class Solution {
+public:
+    int minimumTotal(vector<vector<int>>& tri) {
+        int n = tri.size();
+
+        for(int row = 1; row < n; row++){
+            for(int col = 0; col <= row; col++){
+                int prev_row_up = tri[row-1][min(col, (int)tri[row-1].size()-1)];
+                int prev_row_left = tri[row-1][max(col-1, 0)];
+                tri[row][col] += min(prev_row_up, prev_row_left);
+            }
+        }
+        return *min_element(tri[n-1].begin(), tri[n-1].end());
+    }
+};
+
