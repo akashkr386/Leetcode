@@ -1,0 +1,118 @@
+// ques - Topological sort gfg
+
+//Approach - 1
+//using DFS
+
+class Solution {
+  public:
+    
+    void DFS(vector<vector<int>>&adj, int u, vector<bool>&vis, stack<int>&st){
+        
+        vis[u] = true;
+        
+        for(int &v : adj[u]){
+            if(!vis[v]){
+                DFS(adj, v, vis, st);
+            }
+        }
+        st.push(u);
+        
+        
+        return;
+    }
+  
+  
+    vector<int> topoSort(int V, vector<vector<int>>& edges) {
+        vector<vector<int>>adj(V);
+        
+        for(int i = 0; i < edges.size(); i++){
+            int u = edges[i][0];
+            int v = edges[i][1];
+            
+            adj[u].push_back(v);
+        }
+        
+        vector<bool>vis(V, 0);
+        stack<int>st;
+        vector<int>ans;
+        
+        for(int i = 0; i < V; i++){
+            if(!vis[i] )
+            DFS(adj, i, vis, st);
+        }
+        
+        while(!st.empty()){
+            ans.push_back(st.top());
+            st.pop();
+        }
+        return ans;
+    }
+};
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+//Approach - 2
+//Using BFS + kahn's algo
+
+class Solution {
+  public:
+    //Kahn's algorithm
+    
+    void BFS(vector<vector<int>>&adj, int node, vector<int>&inDeg, vector<bool>&vis, vector<int>&ans, queue<int>&q){
+        
+        vis[node] = true;
+        
+        while(!q.empty()){
+            node = q.front();
+            q.pop();
+            
+            for(int j = 0; j < adj[node].size(); j++){
+                int neighbour = adj[node][j];
+                
+                inDeg[neighbour]--;
+                if(inDeg[neighbour] == 0){
+                    ans.push_back(neighbour);
+                    q.push(neighbour);
+                } 
+                
+               
+                
+            }
+        }
+        
+    }
+  
+  
+    vector<int> topoSort(int V, vector<vector<int>>& edges) {
+        vector<vector<int>>adj(V);
+        vector<int>inDeg(V, 0);
+        for(int i = 0; i < edges.size(); i++){
+            int u = edges[i][0];
+            int v = edges[i][1];
+            
+            adj[u].push_back(v);
+            inDeg[v]++;
+        }
+        
+        vector<bool>vis(V, 0);
+        
+        vector<int>ans;
+        
+        queue<int>q;
+        for(int i = 0; i < inDeg.size(); i++){
+            if(inDeg[i] == 0) {
+                q.push(i);
+                ans.push_back(i);
+            }
+        }
+        
+        for(int i = 0; i < V; i++){
+            if(!vis[i]){
+                BFS(adj, i, inDeg, vis, ans, q);
+            }
+        }
+        
+        return ans;
+    }
+};
+
