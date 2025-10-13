@@ -1,0 +1,97 @@
+// Ques - 207. Course Schedule
+
+// Approach 1 - using BFS + kahn's algo
+
+class Solution {
+public:
+    bool canFinish(int numCourses, vector<vector<int>>& prer) {
+        vector<vector<int>>adj(numCourses);
+        vector<int>inDeg(numCourses, 0);
+        for(int i = 0; i < prer.size(); i++){
+            int u = prer[i][0];
+            int v = prer[i][1];
+            // v to u
+            adj[v].push_back(u);
+            inDeg[u]++;
+        }
+
+        queue<int>q;
+        int count = 0;
+        for(int i = 0; i < numCourses; i++){
+            if(inDeg[i] == 0){
+                q.push(i);
+                count++;
+            }
+        }
+        //check karo cycle present hai ya nahi
+        
+        while(!q.empty()){
+            int node = q.front();
+            q.pop();
+
+            for(int &v : adj[node]){
+                inDeg[v]--;
+                if(inDeg[v] == 0){
+                    count++;
+                    q.push(v);
+                }
+            }
+
+        }
+
+        return count == numCourses ? 1 : 0;
+
+    }
+};
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//Approach - 2
+//using DFS + kahn's algo
+
+class Solution {
+public:
+    bool isCycleDFS(vector<vector<int>>&adj, int u, vector<bool>&vis, vector<bool>&inRecursion){
+        vis[u] = true;
+        inRecursion[u] = true;
+
+        for(int &v : adj[u]){
+            if(!vis[v] && isCycleDFS(adj, v, vis, inRecursion)){
+                return true;
+            }
+            else if(inRecursion[v]){
+                return true;
+            }
+        }
+
+        inRecursion[u] = false;
+
+        return false;
+    }
+
+    bool canFinish(int numCourses, vector<vector<int>>& preq) {
+        
+        int V = numCourses;
+
+        vector<vector<int>>adj(V);
+        vector<bool>vis(V, 0);
+        vector<bool>inRecursion(V, 0);
+
+        for(int i = 0; i < preq.size(); i++){
+            int u = preq[i][0];
+            int v = preq[i][1];
+            adj[v].push_back(u);
+        }
+
+        for(int i = 0; i < V; i++){
+            if(!vis[i] && isCycleDFS(adj, i, vis, inRecursion)){
+                return false;
+            }
+        }
+        return true;
+    }
+};
+
+
+
+
+
