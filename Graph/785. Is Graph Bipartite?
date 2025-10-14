@@ -1,0 +1,88 @@
+// Ques - 785. Is Graph Bipartite?
+// this algorithm is also called "coloring method"/ two color method
+
+//Approach 1 - using DFS
+
+class Solution {
+  public:
+    
+    bool DFS(vector<vector<int>>&adj, int u, vector<int>&color, int cl){
+        
+        color[u] = cl;
+        
+        for(int &v : adj[u]){
+            if(color[v] == -1){
+                if(!DFS(adj, v, color, 1-cl)) return false;
+            }
+            else if(color[v] == color[u]) return false;
+            
+        }
+        
+        return true;
+    }
+  
+  
+    bool isBipartite(int V, vector<vector<int>> &edges) {
+        
+        vector<vector<int>>adj(V);
+        
+        for(int i = 0; i < edges.size(); i++){
+            int u = edges[i][0];
+            int v = edges[i][1];
+            adj[u].push_back(v);
+            adj[v].push_back(u);
+        }
+        //1 --> red
+        //0 -->blue
+        
+        vector<int>color(V, -1);
+        
+        for(int i = 0; i < V; i++){
+            if(color[i] == -1){
+                if(!DFS(adj, i, color, 0)) return false;
+            }
+        }
+        
+        
+        return true;
+    }
+};
+----------------------------------------------------------------------------------------------------------------------------
+
+// Approach 2 
+//using BFS
+
+class Solution {
+public:
+    bool isBipartite(vector<vector<int>>& graph) {
+        int V = graph.size();
+
+        vector<int> color(V, -1);
+        // 1 --- red
+        // 0 --- blue
+        for (int i = 0; i < V; i++) {
+            if (color[i] == -1) {
+                queue<int> q;
+                q.push(i);
+                color[i] = 1;
+
+                while (!q.empty()) {
+                    int node = q.front();
+                    q.pop();
+
+                    for (int& v : graph[node]) {
+
+                        if (color[v] == color[node])
+                            return false;
+                        else if (color[v] == -1) {
+                            color[v] = (color[node] == 0 ? 1 : 0);
+                            q.push(v);
+                        }
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+};
