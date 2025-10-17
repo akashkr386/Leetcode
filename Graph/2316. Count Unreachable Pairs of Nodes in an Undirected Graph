@@ -1,0 +1,173 @@
+// Ques - 2316. Count Unreachable Pairs of Nodes in an Undirected Graph
+
+//Approach - 1
+//using DFS
+
+class Solution {
+public:
+    void countNode(vector<vector<int>>&adj, int u, vector<bool>&vis, long long &cnt){
+        vis[u] = true;
+        cnt+=1;
+
+        for(int &v : adj[u]){
+            if(!vis[v]){ 
+                countNode(adj, v, vis, cnt);
+            }
+        }
+    }
+
+    long long countPairs(int n, vector<vector<int>>& edges) {
+        vector<vector<int>>adj(n);
+
+        for(int i = 0; i < edges.size(); i++){
+            int u = edges[i][0];
+            int v = edges[i][1];
+
+            adj[u].push_back(v);
+            adj[v].push_back(u);
+        }
+
+        vector<bool>vis(n, 0);
+        long long res = 0;
+        long long remNode = n;
+
+        for(int i = 0; i < n; i++){
+            if(!vis[i]){
+                long long cnt = 0;
+                countNode(adj, i, vis, cnt);
+                res += cnt*(remNode-cnt);
+                remNode = remNode-cnt;
+            }
+        }
+
+
+        return res;
+    }
+};
+
+--------------------------------------------------------------------------------------------------------------------------
+// Approach- 2
+//using BFS
+
+class Solution {
+public:
+    void countNode(vector<vector<int>>&adj, int u, vector<bool>&vis, long long &cnt){
+        vis[u] = true;
+        cnt+=1;
+
+        queue<int>q;
+        q.push(u);
+
+        while(!q.empty()){
+            int node = q.front();
+            q.pop();
+
+            for(int &v : adj[node]){
+                if(!vis[v]){
+                    cnt++;
+                    vis[v] = true;
+                    q.push(v);
+                }
+            }
+
+        }
+
+        
+    }
+
+    long long countPairs(int n, vector<vector<int>>& edges) {
+        vector<vector<int>>adj(n);
+
+        for(int i = 0; i < edges.size(); i++){
+            int u = edges[i][0];
+            int v = edges[i][1];
+
+            adj[u].push_back(v);
+            adj[v].push_back(u);
+        }
+
+        vector<bool>vis(n, 0);
+        long long res = 0;
+        long long remNode = n;
+
+        for(int i = 0; i < n; i++){
+            if(!vis[i]){
+                long long cnt = 0;
+                countNode(adj, i, vis, cnt);
+                res += cnt*(remNode-cnt);
+                remNode = remNode-cnt;
+            }
+        }
+
+
+        return res;
+    }
+};
+
+-----------------------------------------------------------------------------------------------------------------------------
+//Approach - 3
+// using DSU
+
+class Solution {
+public:
+    typedef long long ll;
+
+    vector<int>parent;
+    vector<int>rank;
+
+    int find(int x){
+        if(x == parent[x]) return x;
+        return parent[x] = find(parent[x]);
+    }
+
+    void Union(int x, int y){
+        int x_parent = find(x);
+        int y_parent = find(y);
+
+        if(rank[x_parent] > rank[y_parent]){
+            parent[y_parent] = x_parent;
+        }
+        else if(rank[x_parent] < rank[y_parent]){
+            parent[x_parent] = y_parent;
+        }
+        else{
+            rank[x_parent]++;
+            parent[y_parent] = x_parent;
+        }
+
+    }
+
+
+    long long countPairs(int n, vector<vector<int>>& edges) {
+        rank.resize(n, 0);
+        parent.resize(n);
+
+        for(int i = 0; i < n; i++){
+            parent[i] = i;
+        }
+
+        unordered_map<ll, ll>mp;
+
+        for(int i = 0; i < edges.size(); i++){
+            int u = edges[i][0];
+            int v = edges[i][1];
+
+            Union(u, v);
+        }
+
+        for(int i = 0; i < n; i++){
+            int papajii = find(i);
+            mp[papajii]++;
+        }
+        ll remSize = n;
+        ll res = 0;
+
+        for(auto &size : mp){
+            ll s = size.second;
+            res += s * (remSize-s);
+            remSize -= s;
+        }
+
+        return res;
+    }
+};
