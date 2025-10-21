@@ -1,0 +1,58 @@
+// Ques - Dijkstra Algorithm
+
+//using BFS
+
+// User Function Template
+class Solution {
+  public:
+    
+  
+    vector<int> dijkstra(int V, vector<vector<int>> &edges, int src) {
+        
+        vector<vector<pair<int, int>>>adj(V);
+        
+        for(int i = 0; i < edges.size(); i++){
+            int u = edges[i][0];
+            int v = edges[i][1];
+            int wt = edges[i][2];
+            
+            adj[u].push_back({v, wt});
+            adj[v].push_back({u, wt});
+        }
+        
+                    // wt , node
+        
+        priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>>pq;
+        
+        vector<int>res(V, INT_MAX);
+                //wt, node
+        pq.push({0, src});
+        res[src] = 0;
+        
+        while(!pq.empty()){
+            int wt = pq.top().first;
+            int node = pq.top().second;
+            pq.pop();
+            
+            //saare neighbour visit kar lo
+            
+            for(auto &v : adj[node]){
+                int neigh = v.first;
+                int neigh_wt = v.second;
+                
+                if(wt+neigh_wt < res[neigh]){
+                    res[neigh] = wt+neigh_wt;
+                    pq.push({res[neigh], neigh});
+                }
+                
+            }
+            
+        }
+        
+        return res;
+        
+    }
+};
+
+
+
