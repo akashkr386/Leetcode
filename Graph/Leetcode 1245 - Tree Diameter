@@ -1,0 +1,58 @@
+//Leetcode 1245 Tree Diameter
+
+
+pair<int, int> fartestNode(unordered_map<int, vector<int>>&adj, int startNode, int n){
+    vector<bool>vis(n, false);
+    vis[startNode] = true;
+    queue<int>q;
+    q.push(startNode);
+    int fartNode = startNode;
+    int dist = 0;
+    
+    
+    while(!q.empty()){
+        int size = q.size();
+        dist++;
+        
+        while(size > 0){
+            int node = q.front();
+            fartNode = node;
+            q.pop();
+            for(int &it : adj[node]){
+                if(!vis[it]){
+                    q.push(it);
+                    vis[it] = true;
+                }
+                
+            }
+            size--;
+        }
+    }
+    return make_pair(fartNode, dist);
+}
+
+
+int TreeDiameter(vector<vector<int>>&edges){
+    unordered_map<int, vector<int>>adj;
+    
+    int n = edges.size()+1;
+    
+    for(auto &it : edges){
+        int u = it[0];
+        int v = it[1];
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    
+    //Step 1 find first fartest node ex- B level order traversel
+    
+    pair<int, int> p = fartestNode(adj, 0, n);
+    int B = p.first;
+    //ab hamara eak confirm side mil gaya hai now same process karo es new Node B se
+    p = fartestNode(adj, B, n);
+    
+    return p.second;
+    
+}
+
+
