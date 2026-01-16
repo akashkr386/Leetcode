@@ -1,0 +1,47 @@
+// left child - 2*i+1 par
+//Right Child- 2*i+2  par
+
+#include<bits/stdc++.h>
+using namespace std;
+
+vector<int>seg;
+
+void buildTree(int i, vector<int>&nums, int left, int right){
+    if(left == right){
+        seg[i] = nums[left];
+        return;
+    }
+    
+    int mid = left+(right-left)/2;
+    
+    buildTree(2*i+1, nums, left, mid);
+    buildTree(2*i+2, nums, mid+1, right);
+    
+    seg[i] = seg[2*i+1]+seg[2*i+2];
+}
+
+
+int main(){
+    string input;
+    getline(cin , input);
+    
+    stringstream ss(input);
+    string token;
+    vector<int>nums;
+    
+    while(getline(ss, token, ' ')){
+        nums.push_back(stoi(token));
+    }
+    int n = nums.size();
+
+    
+    seg.resize(2*n-1, 0);
+    
+    buildTree(0, nums, 0, n-1);
+    
+    for(int i = 0; i < 2*n-1; i++){
+        cout<<seg[i]<<" ";
+    }
+    
+    return 0;
+}
