@@ -1,5 +1,7 @@
 // left child - 2*i+1 par
 //Right Child- 2*i+2  par
+// Time Complexity - O(n)
+//Space Complexity - O(2*n)
 
 #include<bits/stdc++.h>
 using namespace std;
